@@ -9,13 +9,13 @@ You need:
     $diskutil umountDisk /dev/diskXX
     $sudo dd bs=1m if=YOUR_DEBIAN_IMAGE.img of=/dev/diskXX
 
-4) Wi-Fi antenna: https://a.co/d/iJQG14q (and probably one adapter to position it vertically: https://a.co/d/5s4Vh7K or https://a.co/d/emR3M5Q)
+4) Wi-Fi antenna: https://a.co/d/iJQG14q (and probably an adapter to position it vertically: https://a.co/d/5s4Vh7K or https://a.co/d/emR3M5Q)
 
 5) Bluetooth antenna: https://a.co/d/b7k7l8m
 
 6) RTLSDR antenna: https://a.co/d/3jz200p and https://a.co/d/i7Eb5bL (some small aluminum heatsinks are recommended: https://a.co/d/gsmvaQR)
 
-7) TP-Link Tapo HUB: https://a.co/d/0uGxz3i (configure it with static IP address and connect it with an ethernet cable)
+7) TP-Link Tapo HUB: https://a.co/d/0uGxz3i (configure it with a static IP address and connect it via Ethernet)
 
 
 -------------------------------------
@@ -78,6 +78,7 @@ auto eno1
 iface eno1  inet static
  address YOUR_DESIRED_STATIC_IP_ADDRESS_GOES_HERE
  netmask 255.255.255.0
+# YOUR ROUTER IP ADDRESS:
  gateway 192.168.1.1
  dns-domain sweet.home
  dns-nameservers 9.9.9.9 149.112.112.112
@@ -233,7 +234,7 @@ $sudo nano /home/YOUR_DEBIAN_USER/scripts/alarm.sh
 #!/bin/bash
 webserv="http://YOUR_KISMET_USER:YOUR_KISMET_PASSWORD@YOUR_KISMET_SERVER_IP:2501/alerts/all_alerts.json"
 while [ 1 = 1 ]; do
-# CHANGE YOUR_SSID BY YOUR WIFI SSID NAME AND XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY WITH THE IP ADDRESS OF ALL YOUR CLIENTS CONNECTED TO YOUR NETWORK, ADD this "|" between each IP ADDRESS, AS SHOWN BELOW IN THE EXAMPLE:
+# CHANGE YOUR_SSID BY YOUR WIFI SSID NAME AND XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY WITH THE IP ADDRESS OF ALL YOUR CLIENTS CONNECTED TO YOUR NETWORK, ADD this "|" between each IP ADDRESS, AS SHOWN BELOW:
 if curl -s "$webserv" | grep -iqE "(YOUR_SSID_NAME|XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY)"; then
         /home/YOUR_DEBIAN_USER/.local/bin/kasa --username YOUR_TAPO_EMAIL --password YOUR_TAPO_PASSWORD --host YOUR_TAPO_HUB_IP_ADDRESS feature test_alarm 1 > /dev/null
         ps -ef | grep kismet | grep -v grep | awk '{print $2}' | xargs kill > /dev/null
@@ -265,6 +266,7 @@ then
 mv /home/YOUR_DEBIAN_USER/logs/*.pcapng /home/YOUR_DEBIAN_USER/logs/files
 fi
 # Execute Kismet
+#CHANGE wlxe84e06b0d4d6, hci0, AND rtl433-0 WITH YOUR DATA SOURCES: $ip link show
 /bin/kismet -u YOUR_DEBIAN_USER -c wlxe84e06b0d4d6:kismon0 -c hci0:linuxbluetooth -c rtl433-0
 
 
