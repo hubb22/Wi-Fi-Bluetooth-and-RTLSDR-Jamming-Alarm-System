@@ -7,4 +7,4 @@ Software used for this project:
 2) Python Kasa (https://github.com/python-kasa/python-kasa)
 3) UFW, GPG, Git, cURL, Python3, PIPX, RTL-433, and some bash scripts written by me.
 
-<br><br>How to: https://github.com/hubb22/Wi-Fi-Bluetooth-and-RTL-SDR-Jamming-Alarm-System/blob/main/How%20to
+<br>How to: https://github.com/hubb22/Wi-Fi-Bluetooth-and-RTL-SDR-Jamming-Alarm-System/blob/main/How%20to
