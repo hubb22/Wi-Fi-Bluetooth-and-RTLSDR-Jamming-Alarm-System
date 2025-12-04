@@ -266,7 +266,7 @@ then
 mv /home/YOUR_DEBIAN_USER/logs/*.pcapng /home/YOUR_DEBIAN_USER/logs/files
 fi
 # Execute Kismet
-#CHANGE wlxe84e06b0d4d6, hci0, AND rtl433-0 WITH YOUR DATA SOURCES: $ip link show
+#CHANGE wlxe84e06b0d4d6:kismon0, hci0:linuxbluetooth, AND rtl433-0 WITH YOUR DATA SOURCES: $ip link show
 /bin/kismet -u YOUR_DEBIAN_USER -c wlxe84e06b0d4d6:kismon0 -c hci0:linuxbluetooth -c rtl433-0
 
 
