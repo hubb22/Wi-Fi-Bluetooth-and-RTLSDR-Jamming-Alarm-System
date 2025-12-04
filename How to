@@ -1,0 +1,616 @@
+# Wi-Fi, Bluetooth and RTLSDR Jamming Alarm System
+
+You need:
+
+1) Debian without GUI: https://www.debian.org
+   
+2) BalenaEtcher (https://www.balena.io/etcher) or 'dd command' to create a bootable USB:
+    $diskutil list
+    $diskutil umountDisk /dev/diskXX
+    $sudo dd bs=1m if=YOUR_DEBIAN_IMAGE.img of=/dev/diskXX
+
+4) Wi-Fi antenna: https://a.co/d/iJQG14q (and probably one adapter to position it vertically: https://a.co/d/5s4Vh7K or https://a.co/d/emR3M5Q)
+
+5) Bluetooth antenna: https://a.co/d/b7k7l8m
+
+6) RTLSDR antenna: https://a.co/d/3jz200p and https://a.co/d/i7Eb5bL (some small aluminum heatsinks are recommended: https://a.co/d/gsmvaQR)
+
+7) TP-Link Tapo HUB: https://a.co/d/0uGxz3i (configure it with static IP address and connect it with an ethernet cable)
+
+
+-------------------------------------
+
+
+$sudo passwd root
+
+# Enter the new password for root account
+
+$su --login
+
+$apt install sudo -y
+
+$sudo nano /etc/sudoers
+
+
+
+# Allow members of group sudo to execute any command
+%sudo   ALL=(ALL:ALL) ALL
+YOUR_DEBIAN_USER    ALL=(ALL) NOPASSWD:ALL
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo adduser YOUR_DEBIAN_USER sudo
+
+exit
+
+$sudo nano /etc/default/grub
+
+
+
+GRUB_TIMEOUT=0
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo update-grub
+
+$sudo nano ~/.hushlogin
+
+# Press Spacebar, Ctrl + X and save changes (Y)
+
+$sudo touch ~/.hushlogin
+
+$sudo rm /etc/network/interfaces
+
+$sudo nano /etc/network/interfaces
+
+
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eno1
+iface eno1  inet static
+ address YOUR_DESIRED_STATIC_IP_ADDRESS_GOES_HERE
+ netmask 255.255.255.0
+ gateway 192.168.1.1
+ dns-domain sweet.home
+ dns-nameservers 9.9.9.9 149.112.112.112
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo systemctl restart networking.service
+
+$sudo rm /etc/resolv.conf
+
+$sudo nano /etc/resolv.conf
+
+
+
+nameserver 9.9.9.9
+nameserver 149.112.112.112
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo apt install resolvconf -y
+
+$sudo nano /etc/resolvconf/resolv.conf.d/tail
+
+
+
+nameserver 9.9.9.9
+nameserver 149.112.112.112
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo reboot now
+
+$ip -c addr show
+
+$sudo apt install ufw -y
+
+$sudo ufw default deny incoming
+
+$sudo ufw default deny outgoing
+
+$sudo ufw allow from 192.168.1.0/24 to any port 22
+
+$sudo ufw allow from 192.168.1.0/24 to any port 2501
+
+$sudo ufw allow from 10.0.0.0/24 to any port 22
+
+$sudo ufw allow from 10.0.0.0/24 to any port 2501
+
+$sudo ufw allow 123/udp
+
+$sudo ufw allow out 123/udp
+
+$sudo ufw allow out 53
+
+$sudo ufw show added
+
+$sudo ufw status
+
+$sudo dpkg-reconfigure locales
+
+$sudo nano /etc/profile
+
+
+
+# FOR ENGLISH LOCALIZATION ADD:
+export LANG="en_US.utf8"
+export LANGUAGE="en_US.utf8"
+export LC_ALL="en_US.utf8"
+
+# FOR SPANISH LOCALIZATION ADD:
+export LANG="es_ES.utf8"
+export LANGUAGE="es_ES.utf8"
+export LC_ALL="es_ES.utf8"
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+# FOR ENGLISH LOCALIZATION ENTER:
+$sudo update-locale LANG=en_US.UTF-8
+
+# FOR SPANISH LOCALIZATION ENTER:
+$sudo update-locale LANG=es_ES.UTF-8
+
+$sudo apt update && sudo apt upgrade -y
+
+$sudo apt install rfkill -y
+
+$sudo apt install firmware-realtek -y
+
+$sudo reboot now
+
+$sudo rfkill list
+
+$sudo rfkill unblock all
+
+$lsusb -vt
+
+# FIND THE BLUETOOTH MODULE ID, EXAMPLE: 0bda:a743
+
+$sudo nano /etc/udev/rules.d/50-usb_power_save.rules
+
+
+
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="FIRST_PART_OF_THE_ID_GOES_HERE", ATTR{idProduct}=="SECOND_PART_OF_THE_ID_GOES_HERE", ATTR{power/autosuspend}="-1"
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo apt install gpg -y
+
+$wget -O - https://www.kismetwireless.net/repos/kismet-release.gpg.key --quiet | gpg --dearmor | sudo tee /usr/share/keyrings/kismet-archive-keyring.gpg >/dev/null
+
+$echo 'deb [signed-by=/usr/share/keyrings/kismet-archive-keyring.gpg] https://www.kismetwireless.net/repos/apt/release/trixie trixie main' | sudo tee /etc/apt/sources.list.d/kismet.list >/dev/null
+
+$sudo apt update
+
+$sudo apt install kismet -y
+
+# SELECT YES WHEN PROMPTED
+
+$sudo apt install lshw -y
+
+$sudo lshw -C network
+
+$sudo apt install build-essential git libwebsockets-dev pkg-config \
+zlib1g-dev libnl-3-dev libnl-genl-3-dev libcap-dev libpcap-dev \
+libnm-dev libdw-dev libsqlite3-dev libprotobuf-dev libprotobuf-c-dev \
+protobuf-compiler protobuf-c-compiler libsensors-dev libusb-1.0-0-dev \
+python3 python3-setuptools python3-protobuf python3-requests \
+python3-numpy python3-serial python3-usb python3-dev python3-websockets \
+libubertooth-dev libbtbb-dev libmosquitto-dev librtlsdr-dev -y
+
+$sudo apt install rtl-433 -y
+
+$sudo reboot now
+
+$sudo mkdir /home/YOUR_DEBIAN_USER/scripts
+
+$sudo chmod 755 -R /home/YOUR_DEBIAN_USER/scripts
+
+$sudo nano /home/YOUR_DEBIAN_USER/scripts/alarm.sh
+
+
+
+#!/bin/bash
+webserv="http://YOUR_KISMET_USER:YOUR_KISMET_PASSWORD@YOUR_KISMET_SERVER_IP:2501/alerts/all_alerts.json"
+while [ 1 = 1 ]; do
+# CHANGE YOUR_SSID BY YOUR WIFI SSID NAME AND XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY WITH THE IP ADDRESS OF ALL YOUR CLIENTS CONNECTED TO YOUR NETWORK, ADD this "|" between each IP ADDRESS, AS SHOWN BELOW IN THE EXAMPLE:
+if curl -s "$webserv" | grep -iqE "(YOUR_SSID_NAME|XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY)"; then
+        /home/YOUR_DEBIAN_USER/.local/bin/kasa --username YOUR_TAPO_EMAIL --password YOUR_TAPO_PASSWORD --host YOUR_TAPO_HUB_IP_ADDRESS feature test_alarm 1 > /dev/null
+        ps -ef | grep kismet | grep -v grep | awk '{print $2}' | xargs kill > /dev/null
+        sleep 600
+        /home/YOUR_DEBIAN_USER/.local/bin/kasa --username YOUR_TAPO_EMAIL --password YOUR_TAPO_PASSWORD --host YOUR_TAPO_HUB_IP_ADDRESS feature stop_alarm 1 > /dev/null
+        mv /home/YOUR_DEBIAN_USER/logs/*.pcapng /home/YOUR_DEBIAN_USER/logs/files/alerts
+        sleep 10
+        sudo -u root systemctl reboot -i > /dev/null
+        exit 0
+fi
+sleep 1
+done
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo chmod a+x /home/YOUR_DEBIAN_USER/scripts/alarm.sh
+
+$sudo nano /home/YOUR_DEBIAN_USER/scripts/kismet.sh
+
+
+
+#!/bin/bash
+# Log management
+count=`ls -1 /home/YOUR_DEBIAN_USER/logs/*.pcapng 2>/dev/null | wc -l`
+if [ $count != 0 ]
+then
+mv /home/YOUR_DEBIAN_USER/logs/*.pcapng /home/YOUR_DEBIAN_USER/logs/files
+fi
+# Execute Kismet
+/bin/kismet -u YOUR_DEBIAN_USER -c wlxe84e06b0d4d6:kismon0 -c hci0:linuxbluetooth -c rtl433-0
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo chmod a+x /home/YOUR_DEBIAN_USER/scripts/kismet.sh
+
+$sudo nano /home/YOUR_DEBIAN_USER/scripts/monitor.sh
+
+
+
+#!/bin/bash
+uptime -p >/dev/null 2>&1
+if [ "$?" -eq 0 ]; then
+  # Supports most Linux distro
+  UP_SET_OR_EMPTY=$(uptime -p | awk -F 'up ' '{print $2}')
+  UP=${UP_SET_OR_EMPTY:-'less than a minute'}
+else
+  # Supports Mac OS X, Debian 7, etc
+  UP=$(uptime | sed -E 's/^[^,]*up *//; s/mins/minutes/; s/hrs?/hours/;
+  s/([[:digit:]]+):0?([[:digit:]]+)/\1 hours, \2 minutes/;
+  s/^1 hours/1 hour/; s/ 1 hours/ 1 hour/;
+  s/min,/minutes,/; s/ 0 minutes,/ less than a minute,/; s/ 1 minutes/ 1 minute/;
+  s/  / /; s/, *[[:digit:]]* users?.*//')
+fi
+echo "CPU `LC_ALL=C top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}'`% RAM `free -m | awk '/Mem:/ { printf("%3.1f%%", $3/$2*100) }'` HDD `df -h / | awk '/\// {print $(NF-1)}'` | UPTIME: $UP" | tr a-z A-Z
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo chmod +x /home/YOUR_DEBIAN_USER/scripts/monitor.sh
+
+$sudo nano /home/YOUR_DEBIAN_USER/scripts/clean.sh
+
+
+
+#!/bin/bash
+ps -ef | grep kismet | grep -v grep | awk '{print $2}' | xargs kill
+ps -ef | grep alarm.sh | grep -v grep | awk '{print $2}' | xargs kill
+count1=`ls -1 /home/YOUR_DEBIAN_USER/logs/*.pcapng 2>/dev/null | wc -l`
+if [ $count1 != 0 ]
+then
+mv /home/YOUR_DEBIAN_USER/logs/*.pcapng /home/YOUR_DEBIAN_USER/logs/files
+fi
+count2=`ls -1 /home/YOUR_DEBIAN_USER/logs/files/*.pcapng 2>/dev/null | wc -l`
+if [ $count2 != 0 ]
+then
+find /home/YOUR_DEBIAN_USER/logs/files -type f -name '*.pcapng' -delete
+fi
+count3=`ls -1 /home/YOUR_DEBIAN_USER/logs/files/alerts/*.pcapng 2>/dev/null | wc -l`
+if [ $count3 != 0 ]
+then
+find /home/YOUR_DEBIAN_USER/logs/files/alerts -type f -name '*.pcapng' -delete
+fi
+/sbin/shutdown -r +1 > /dev/null
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo chmod +x /home/YOUR_DEBIAN_USER/scripts/clean.sh
+
+$sudo nano ~/.profile
+
+
+
+if [ -f ~/.bashrc ]; then
+    /home/YOUR_DEBIAN_USER/scripts/monitor.sh ~/.bashrc
+fi
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$su
+
+$crontab -e
+
+# PRESS 1
+
+
+
+29 6 * * 1 /home/YOUR_DEBIAN_USER/scripts/clean.sh > /dev/null
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$date
+
+$timedatectl set-ntp yes
+
+$exit
+
+$sudo nano /etc/rc.local
+
+
+
+#!/bin/bash
+sleep 1 && su - YOUR_DEBIAN_USER -c "env DISPLAY=:0.0 nohup  /home/YOUR_DEBIAN_USER/scripts/kismet.sh &"
+sleep 6 && su - YOUR_DEBIAN_USER -c "env DISPLAY=:0.0 nohup  /home/YOUR_DEBIAN_USER/scripts/alarm.sh &"
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo chmod 755 /etc/rc.local
+
+$sudo chmod a+x /etc/rc.local
+
+$sudo mkdir /home/YOUR_DEBIAN_USER/logs
+
+$sudo mkdir /home/YOUR_DEBIAN_USER/logs/files
+
+$sudo mkdir /home/YOUR_DEBIAN_USER/logs/files/alerts
+
+$sudo chmod 755 -R /home/YOUR_DEBIAN_USER/logs
+
+$sudo chmod 755 -R /home/YOUR_DEBIAN_USER/logs/files
+
+$sudo chmod 755 -R /home/YOUR_DEBIAN_USER/logs/files/alerts
+
+$sudo chown YOUR_DEBIAN_USER:kismet -R /home/YOUR_DEBIAN_USER/logs
+
+$sudo chown YOUR_DEBIAN_USER:kismet -R /home/YOUR_DEBIAN_USER/logs/files
+
+$sudo chown YOUR_DEBIAN_USER:kismet -R /home/YOUR_DEBIAN_USER/logs/files/alerts
+
+$sudo mv /etc/kismet/kismet_alerts.conf /etc/kismet/kismet_alerts-bak.conf
+
+$sudo nano /etc/kismet/kismet_alerts.conf
+
+
+
+# Kismet alerts configuration
+devicefound_timeout=60
+devicelost_timeout=60
+prelude_alerts=false
+# CHANGE YOUR_SSID BY YOUR WIFI SSID NAME AND XX:XX:XX:XX:XX:XX,YY:YY:YY:YY:YY:YY WITH THE IP ADDRESS OF ALL YOUR CLIENTS CONNECTED TO YOUR NETWORK, ADD a comma "," between each IP ADDRESS, AS SHOWN BELOW IN THE EXAMPLE:
+apspoof=SSID:ssid="YOUR_SSID",validmacs="XX:XX:XX:XX:XX:XX,YY:YY:YY:YY:YY:YY"
+alert=ADHOCCONFLICT,5/min,1/sec
+alert=ADVCRYPTCHANGE,5/min,1/sec
+alert=AIRJACKSSID,5/min,1/sec
+alert=APSPOOF,10/min,1/sec
+alert=BCASTDISCON,5/min,2/sec
+alert=BCOM11KCHAN,10/min,1/sec
+alert=BEACONRATE,5/min,1/sec
+alert=BLEEDINGTOOTH,5/min,1/sec
+alert=BSSTIMESTAMP,5/min,1/sec
+alert=CHANCHANGE,5/min,1/sec
+alert=CRYPTODROP,5/min,1/sec
+alert=DEAUTHFLOOD,5/min,2/sec
+alert=DEAUTHCODEINVALID,0/min,0/sec
+alert=DHCPNAMECHANGE,5/min,1/sec
+alert=DHCPOSCHANGE,5/min,1/sec
+alert=DHCPCLIENTID,5/min,1/sec
+alert=DHCPCONFLICT,10/min,1/sec
+alert=DISASSOCTRAFFIC,10/min,1/sec
+alert=DISCONCODEINVALID,5/min,1/sec
+alert=DOT11D,5/min,1/sec
+alert=FLIPPERZERO,5/min,1/sec
+alert=FORMATSTRING,5/min,1/sec
+alert=KARMAOUI,5/min,1/sec
+alert=LUCENTTEST,0/min,0/sec
+alert=LONGSSID,5/min,1/sec
+alert=MSFBCOMSSID,5/min,1/sec
+alert=MSFDLINKRATE,5/min,1/sec
+alert=MSFNETGEARBEACON,5/min,1/sec
+alert=MALFORMMGMT,5/min,1/sec
+alert=NETSTUMBLER,0/min,0/sec
+alert=NOCLIENTMFP,0/min,0/sec
+alert=NONCEDEGRADE,0/min,0/sec
+alert=NONCEREUSE,0/min,0/sec
+alert=NULLPROBERESP,5/min,1/sec
+alert=OVERPOWERED,0/min,0/sec
+alert=PROBECHAN,5/min,1/sec
+alert=QCOMEXTENDED,0/min,0/sec
+alert=RSNLOOP,5/min,1/sec
+alert=RTL8195VD1406,5/min,1/sec
+alert=RTLWIFIP2P,5/min,1/sec
+alert=SSIDCANARY,5/min,1/sec
+alert=VDOO202027301,5/min,1/sec
+alert=VDOO202027302,5/min,1/sec
+alert=WPSBRUTE,5/min,1/sec
+alert=WMMOVERFLOW,10/min,1/sec
+alert=WMMTSPEC,10/min,1/sec
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo mv /etc/kismet/kismet_logging.conf /etc/kismet/kismet_logging-bak.conf
+
+$sudo nano /etc/kismet/kismet_logging.conf
+
+
+
+# Kismet logging configuration
+enable_logging=true
+log_title=Kismet
+# CHANGE YOUR_DEBIAN_USER BY YOUR USER NAME
+log_prefix=/home/YOUR_DEBIAN_USER/logs/
+log_types=pcapng
+log_template=%p/%n-%D-%t-%i.%l
+kis_log_devices=true
+kis_log_device_rate=30
+kis_log_packets=true
+kis_log_data_packets=true
+kis_log_messages=true
+kis_log_alerts=true
+kis_log_datasources=true
+kis_log_datasources_rate=30
+kis_log_channel_history=true
+kis_log_channel_history_rate=20
+kis_log_gps_track=true
+kis_log_system_status=true
+kis_log_system_status_rate=30
+pcapng_log_data_packets=true
+ppi_log_duplicate_packets=true
+ppi_log_data_packets=true
+log_config_present=true
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo mv /etc/kismet/kismet.conf /etc/kismet/kismet-bak.conf
+
+$sudo nano /etc/kismet/kismet.conf
+
+
+
+# Kismet config file
+opt_override=%E/kismet_package.conf
+opt_override=%E/kismet_site.conf
+include=%E/kismet_httpd.conf
+include=%E/kismet_memory.conf
+include=%E/kismet_alerts.conf
+include=%E/kismet_80211.conf
+include=%E/kismet_logging.conf
+include=%E/kismet_filter.conf
+include=%E/kismet_uav.conf
+helper_binary_path=%B
+server_announce=false
+server_announce_address=0.0.0.0
+server_announce_port=2501
+remote_capture_enabled=true
+remote_capture_listen=127.0.0.1
+remote_capture_port=3501
+channel_hop=true
+channel_hop_speed=5/sec
+split_source_hopping=true
+randomized_hopping=true
+retry_on_source_error=true
+source_stagger_threshold=16
+source_launch_group=8
+source_launch_delay=10
+override_remote_timestamp=true
+allowplugins=false
+ouifile=%S/kismet/kismet_manuf.txt.gz
+icaofile=%S/kismet/kismet_adsb_icao.txt.gz
+allowkeytransmit=true
+configdir=%h/.kismet/
+# CHANGE YOUR_DEBIAN_USER BY YOUR USER NAME
+suiduser=YOUR_DEBIAN_USER
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo mv /etc/kismet/kismet_memory.conf /etc/kismet/kismet_memory-bak.conf
+
+$sudo nano /etc/kismet/kismet_memory.conf
+
+
+
+# Kismet memory and optional features configuration
+tracker_device_presize=1000
+track_device_rrds=true
+track_device_seenby_views=true
+track_device_phy_views=true
+manuf_lookup=true
+keep_location_cloud_history=false
+keep_per_datasource_stats=true
+alertbacklog=1500
+packet_dedup_size=2048
+packet_backlog_warning=0
+packet_backlog_limit=8192
+
+
+
+# Press Ctrl + X and save changes (Y)
+
+$sudo service networking restart
+
+$sudo usermod -aG kismet YOUR_DEBIAN_USER
+
+$sudo reboot now
+
+$groups
+
+$sudo systemctl disable apt-daily-upgrade.timer
+
+$sudo systemctl disable apt-daily.timer
+
+$sudo apt install curl -y
+
+$sudo apt install python3.13 python3.13-venv -y
+
+$python3 -V
+
+$sudo apt install pipx -y
+
+$pipx ensurepath --force
+
+$pipx install python-kasa -y
+
+$pipx ensurepath --force
+
+$sudo ufw allow out to 34.198.172.159 port 443
+
+$sudo ufw allow from 34.198.172.159
+
+$sudo ufw allow out to 34.199.76.247 port 443
+
+$sudo ufw allow from 34.199.76.247
+
+$sudo ufw allow out to 10.0.0.0/24 port 20002
+
+$sudo ufw allow out to 192.168.1.0/24 port 20002
+
+$sudo ufw allow out to 10.0.0.0/24 port 9999
+
+$sudo ufw allow out to 192.168.1.0/24 port 9999
+
+$sudo ufw allow out to 192.168.1.0/24 port 443
+
+$sudo apt install python3 shared-mime-info unzip apt-show-versions libapt-pkg-perl libauthen-pam-perl libio-pty-perl libnet-ssleay-perl -y
+
+$sudo service ufw restart
+
+$sudo ufw enable
+
+$sudo reboot now
+
+# ACCESS KISMET WEBPANEL: https://(server's hostname or IP address):2501/
+  USER: YOUR_KISMET_USER (MUST BY THE SAME USED IN alarm.sh)
+  PASSWORD: ADD A NEW PASSWORD (MUST BY THE SAME USED IN alarm.sh)
