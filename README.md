@@ -4,6 +4,6 @@
 <br><br>
 Software used for this project (mainly):
 <br>
-1) Kismet (https://www.kismetwireless.net)
-2) Python Kasa (https://github.com/python-kasa/python-kasa)
+1) Kismet (https://www.kismetwireless.net)<br>
+2) Python Kasa (https://github.com/python-kasa/python-kasa)<br>
 3) UFW, GPG, Git, cURL, Python3, PIPX, RTL-433, and some bash scripts written by me
