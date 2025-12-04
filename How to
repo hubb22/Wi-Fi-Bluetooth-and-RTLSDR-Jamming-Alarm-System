@@ -581,27 +581,11 @@ $sudo apt install pipx -y
 
 $pipx ensurepath --force
 
-$pipx install python-kasa -y
+$pipx install python-kasa
 
 $pipx ensurepath --force
 
-$sudo ufw allow out to 34.198.172.159 port 443
-
-$sudo ufw allow from 34.198.172.159
-
-$sudo ufw allow out to 34.199.76.247 port 443
-
-$sudo ufw allow from 34.199.76.247
-
-$sudo ufw allow out to 10.0.0.0/24 port 20002
-
-$sudo ufw allow out to 192.168.1.0/24 port 20002
-
-$sudo ufw allow out to 10.0.0.0/24 port 9999
-
-$sudo ufw allow out to 192.168.1.0/24 port 9999
-
-$sudo ufw allow out to 192.168.1.0/24 port 443
+$sudo ufw allow out to 34.198.172.159 port 443 && sudo ufw allow from 34.198.172.159 && sudo ufw allow out to 34.199.76.247 port 443 && sudo ufw allow from 34.199.76.247 && sudo ufw allow out to 10.0.0.0/24 port 20002 && sudo ufw allow out to 192.168.1.0/24 port 20002 && sudo ufw allow out to 10.0.0.0/24 port 9999 && sudo ufw allow out to 192.168.1.0/24 port 9999 && sudo ufw allow out to 192.168.1.0/24 port 443
 
 $sudo apt install python3 shared-mime-info unzip apt-show-versions libapt-pkg-perl libauthen-pam-perl libio-pty-perl libnet-ssleay-perl -y
 
