@@ -575,7 +575,7 @@ $sudo systemctl disable apt-daily.timer
 
 $sudo apt install curl -y
 
-$sudo apt install python3.13 python3.13-venv -y
+$sudo apt install python3.13 python3.13-venv python3 shared-mime-info unzip apt-show-versions libapt-pkg-perl libauthen-pam-perl libio-pty-perl libnet-ssleay-perl -y
 
 $python3 -V
 
@@ -604,8 +604,6 @@ $sudo ufw allow out to 10.0.0.0/24 port 9999
 $sudo ufw allow out to 192.168.1.0/24 port 9999
 
 $sudo ufw allow out to 192.168.1.0/24 port 443
-
-$sudo apt install python3 shared-mime-info unzip apt-show-versions libapt-pkg-perl libauthen-pam-perl libio-pty-perl libnet-ssleay-perl -y
 
 $sudo service ufw restart
 
