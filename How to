@@ -611,7 +611,7 @@ $sudo ufw enable
 $sudo reboot now
 
 # Now you can add an automation in the Tapo app so when the hub H200 rings it could wake up other devices connected to the local network.
-# Examples: Activate the alarm at other hubs in the network, turn on smart plugs... The automation will be triggered before the network is down.
+# Examples: Activate the alarm on other hubs, turn on smart plugs... The automation will be triggered before the network is down.
 
 # ACCESS KISMET WEBPANEL: https://(server's hostname or IP address):2501/
   USER: YOUR_KISMET_USER (MUST BY THE SAME USED IN alarm.sh)
