@@ -43,7 +43,7 @@ YOUR_DEBIAN_USER    ALL=(ALL) NOPASSWD:ALL
 
 $sudo adduser YOUR_DEBIAN_USER sudo
 
-exit
+$exit
 
 $sudo nano /etc/default/grub
 
