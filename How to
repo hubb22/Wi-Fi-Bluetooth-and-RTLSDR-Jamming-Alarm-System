@@ -233,7 +233,7 @@ $sudo nano /home/YOUR_DEBIAN_USER/scripts/alarm.sh
 #!/bin/bash
 webserv="http://YOUR_KISMET_USER:YOUR_KISMET_PASSWORD@IP_ADDRESS_OF_THIS_MACHINE:2501/alerts/all_alerts.json"
 while [ 1 = 1 ]; do
-# CHANGE YOUR_SSID BY YOUR WIFI SSID NAME AND XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY WITH THE IP ADDRESS OF ALL YOUR CLIENTS CONNECTED TO YOUR NETWORK, ADD this "|" between each IP ADDRESS, AS SHOWN BELOW:
+# CHANGE YOUR_SSID BY YOUR WIFI NAME AND XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY WITH THE IP ADDRESS OF ALL YOUR CLIENTS CONNECTED TO YOUR NETWORK, ADD this "|" between each IP ADDRESS, AS SHOWN BELOW:
 if curl -s "$webserv" | grep -iqE "(YOUR_SSID_NAME|XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY)"; then
         /home/YOUR_DEBIAN_USER/.local/bin/kasa --username YOUR_TAPO_EMAIL --password YOUR_TAPO_PASSWORD --host YOUR_TAPO_HUB_IP_ADDRESS feature test_alarm 1 > /dev/null
         ps -ef | grep kismet | grep -v grep | awk '{print $2}' | xargs kill > /dev/null
