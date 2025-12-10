@@ -118,30 +118,6 @@ $sudo reboot now
 
 $ip -c addr show
 
-$sudo apt install ufw -y
-
-$sudo ufw default deny incoming
-
-$sudo ufw default deny outgoing
-
-$sudo ufw allow from 192.168.1.0/24 to any port 22
-
-$sudo ufw allow from 192.168.1.0/24 to any port 2501
-
-$sudo ufw allow from 10.0.0.0/24 to any port 22
-
-$sudo ufw allow from 10.0.0.0/24 to any port 2501
-
-$sudo ufw allow 123/udp
-
-$sudo ufw allow out 123/udp
-
-$sudo ufw allow out 53
-
-$sudo ufw show added
-
-$sudo ufw status
-
 $sudo dpkg-reconfigure locales
 
 $sudo nano /etc/profile
@@ -237,10 +213,14 @@ while [ 1 = 1 ]; do
 if curl -s "$webserv" | grep -iqE "(YOUR_SSID_NAME|XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY)"; then
         /home/YOUR_DEBIAN_USER/.local/bin/kasa --username YOUR_TAPO_EMAIL --password YOUR_TAPO_PASSWORD --host YOUR_TAPO_HUB_IP_ADDRESS feature test_alarm 1 > /dev/null
         ps -ef | grep kismet | grep -v grep | awk '{print $2}' | xargs kill > /dev/null
+        # THE ALARM WILL SOUND 10 MINUTES
         sleep 600
+        # STOP THE ALARM
         /home/YOUR_DEBIAN_USER/.local/bin/kasa --username YOUR_TAPO_EMAIL --password YOUR_TAPO_PASSWORD --host YOUR_TAPO_HUB_IP_ADDRESS feature stop_alarm 1 > /dev/null
+        # MOVE THE LOGS TO ~/LOGS/FILES/ALERTS PATH
         mv /home/YOUR_DEBIAN_USER/logs/*.pcapng /home/YOUR_DEBIAN_USER/logs/files/alerts
         sleep 10
+        # REBOOT THE SYSTEM
         sudo -u root systemctl reboot -i > /dev/null
         exit 0
 fi
@@ -578,7 +558,7 @@ $sudo apt install python3.13 python3.13-venv python3 shared-mime-info unzip apt-
 
 $python3 -V
 
-$sudo apt install pipx -y
+$sudo apt install pipx ufw -y
 
 $pipx ensurepath --force
 
@@ -586,27 +566,51 @@ $pipx install python-kasa
 
 $pipx ensurepath --force
 
-$sudo ufw allow out to 34.198.172.159 port 443
+$sudo ufw default deny incoming
 
-$sudo ufw allow from 34.198.172.159
+$sudo ufw default deny outgoing
 
-$sudo ufw allow out to 34.199.76.247 port 443
+# NTP SYNC CONNECTION
 
-$sudo ufw allow from 34.199.76.247
+$sudo ufw allow 123/udp
 
-$sudo ufw allow out to 10.0.0.0/24 port 20002
+$sudo ufw allow out 123/udp
+
+# DNS CONNECTION
+
+$sudo ufw allow out 53
+
+# TAPO HUB, SSH & KISMET CONNECTIONS. THIS RANGE OF IPS ARE COMMONLY USED IN ETHERNET LOCAL NETWORKS, CUSTOMIZE THEM ACCORDING TO YOUR NEEDS.
 
 $sudo ufw allow out to 192.168.1.0/24 port 20002
-
-$sudo ufw allow out to 10.0.0.0/24 port 9999
 
 $sudo ufw allow out to 192.168.1.0/24 port 9999
 
 $sudo ufw allow out to 192.168.1.0/24 port 443
 
-$sudo service ufw restart
+$sudo ufw allow from 192.168.1.0/24 to any port 22
+
+$sudo ufw allow from 192.168.1.0/24 to any port 2501
+
+# TAPO HUB, SSH & KISMET CONNECTIONS. THIS RANGE OF IPS ARE COMMONLY USED IN WI-FI LOCAL NETWORKS, CUSTOMIZE THEM ACCORDING TO YOUR NEEDS.
+
+$sudo ufw allow out to 10.0.0.0/24 port 20002
+
+$sudo ufw allow out to 10.0.0.0/24 port 9999
+
+$sudo ufw allow out to 10.0.0.0/24 port 443
+
+$sudo ufw allow from 10.0.0.0/24 to any port 22
+
+$sudo ufw allow from 10.0.0.0/24 to any port 2501
+
+$sudo ufw show added
 
 $sudo ufw enable
+
+# Press (Y) to enable the firewall
+
+$sudo ufw status
 
 $sudo reboot now
 
