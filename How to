@@ -224,13 +224,13 @@ while [ 1 = 1 ]; do
 # CHANGE YOUR_SSID_NAME BY YOUR WIFI NAME AND XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY WITH THE IP ADDRESS OF ALL YOUR CLIENTS AND ROUTER(S) CONNECTED TO YOUR NETWORK, ADD this "|" between each IP ADDRESS, AS SHOWN BELOW:
 if curl -s "$webserv" | grep -iqE "(YOUR_SSID_NAME|XX:XX:XX:XX:XX:XX|YY:YY:YY:YY:YY:YY)"; then
         /bin/sudo /home/YOUR_DEBIAN_USER/.local/bin/kasa --username YOUR_TAPO_EMAIL --password YOUR_TAPO_PASSWORD --host YOUR_TAPO_HUB_IP_ADDRESS feature test_alarm 1 > /dev/null
-        ps -ef | grep kismet | grep -v grep | awk '{print $2}' | xargs kill > /dev/null
+        /bin/sudo ps -ef | grep kismet | grep -v grep | awk '{print $2}' | xargs kill > /dev/null
         # THE ALARM WILL SOUND 10 MINUTES
         sleep 600
         # STOP THE ALARM
         /bin/sudo /home/YOUR_DEBIAN_USER/.local/bin/kasa --username YOUR_TAPO_EMAIL --password YOUR_TAPO_PASSWORD --host YOUR_TAPO_HUB_IP_ADDRESS feature stop_alarm 1 > /dev/null
         # MOVE THE LOGS TO ~/LOGS/FILES/ALERTS PATH
-        mv /home/YOUR_DEBIAN_USER/logs/*.pcapng /home/YOUR_DEBIAN_USER/logs/files/alerts
+        /bin/sudo mv /home/YOUR_DEBIAN_USER/logs/*.pcapng /home/YOUR_DEBIAN_USER/logs/files/alerts
         sleep 10
         # REBOOT THE SYSTEM
         /bin/sudo -u root systemctl reboot -i > /dev/null
