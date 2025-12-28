@@ -25,7 +25,7 @@ $su --login
 
 $sudo apt update && sudo apt upgrade -y
 
-$sudo apt install sudo openssh-server -y
+$sudo apt install openssh-server sudo -y
 
 $sudo systemctl start ssh && $sudo systemctl enable ssh
 
