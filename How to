@@ -81,6 +81,10 @@ $sudo nano ~/.hushlogin
 
 $sudo touch ~/.hushlogin
 
+$ip -c addr show
+
+# COPY YOUR ETHERNET ID, E.G. eno1
+
 $sudo rm /etc/network/interfaces
 
 $sudo nano /etc/network/interfaces
