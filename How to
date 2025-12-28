@@ -21,10 +21,6 @@ You need:
 -------------------------------------
 
 
-$sudo passwd root
-
-# ENTER THE NEW PASSWORD FOR ROOT ACCOUNT
-
 $su --login
 
 $apt install sudo -y
@@ -42,6 +38,10 @@ YOUR_DEBIAN_USER    ALL=(ALL) NOPASSWD:ALL
 # Press Ctrl + X and save changes (Y)
 
 $sudo adduser YOUR_DEBIAN_USER sudo
+
+$sudo passwd root
+
+# ENTER THE NEW PASSWORD FOR ROOT ACCOUNT
 
 $exit
 
