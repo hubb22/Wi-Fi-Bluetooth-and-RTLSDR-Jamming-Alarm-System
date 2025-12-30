@@ -168,8 +168,6 @@ $sudo update-locale LANG=en_US.UTF-8
 # FOR SPANISH LOCALIZATION ENTER:
 $sudo update-locale LANG=es_ES.UTF-8
 
-$sudo apt update && sudo apt upgrade -y
-
 $sudo apt install rfkill -y
 
 $sudo apt install firmware-realtek -y
@@ -182,7 +180,7 @@ $sudo rfkill unblock all
 
 $lsusb -vt
 
-# FIND THE BLUETOOTH MODULE ID, EXAMPLE: 0bda:a743
+# FIND THE BLUETOOTH MODULE ID, E.G. 0bda:a743
 
 $sudo nano /etc/udev/rules.d/50-usb_power_save.rules
 
